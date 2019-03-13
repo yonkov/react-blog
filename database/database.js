@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 mongoose.Promise = global.Promise;
 module.exports = () => {
-    mongoose.connect('mongodb://localhost:27017/react-project-db', {
+    mongoose.connect('mongodb+srv://Admin:Admin@cluster0-4qvus.mongodb.net/test?retryWrites=true', {
         useNewUrlParser: true
     });       
     const db = mongoose.connection;
