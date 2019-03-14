@@ -100,7 +100,7 @@ class App extends Component {
 
     e.preventDefault()
 
-    fetch('http://localhost:9999/auth/sign' + (isSignUp ? 'up' : 'in'), {
+    fetch('//localhost:9999/auth/sign' + (isSignUp ? 'up' : 'in'), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
@@ -143,7 +143,7 @@ class App extends Component {
     
     e.preventDefault();
     if (this.state.isAdmin) {
-      fetch('http://localhost:9999/feed/post/create', {
+      fetch('//localhost:9999/feed/post/create', {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" }
@@ -172,7 +172,7 @@ class App extends Component {
   handleCommentSubmit(e, data) {
 
     e.preventDefault()
-    fetch('http://localhost:9999/feed/comment/create', {
+    fetch('//localhost:9999/feed/comment/create', {
       method: "POST",
       body: JSON.stringify(data),
       headers: { "Content-Type": "application/json" }
@@ -198,7 +198,7 @@ class App extends Component {
   }
 
   getPosts() {
-    fetch('http://localhost:9999/feed/posts')
+    fetch('//localhost:9999/feed/posts')
       .then(rawData => rawData.json())
       .then(
 

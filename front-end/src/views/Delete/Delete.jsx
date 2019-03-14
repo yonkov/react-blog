@@ -40,7 +40,7 @@ class Delete extends Component {
       
     e.preventDefault();
     
-    fetch('http://localhost:9999/feed/post/delete/' + this.props.match.params.id, {
+    fetch('//localhost:9999/feed/post/delete/' + this.props.match.params.id, {
       method: "POST",
       body: JSON.stringify(data),
       headers: { "Content-Type": "application/json" }

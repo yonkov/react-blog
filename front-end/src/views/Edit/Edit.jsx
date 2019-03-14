@@ -26,7 +26,7 @@ class Edit extends Component {
   }
 
   editGet() {
-    fetch('http://localhost:9999/feed/post/edit/' + this.props.match.params.id)
+    fetch('//localhost:9999/feed/post/edit/' + this.props.match.params.id)
       .then(rawData => rawData.json())
       .then(
         body => {
