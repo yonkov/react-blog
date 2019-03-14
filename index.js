@@ -4,19 +4,8 @@ const bodyParser = require('body-parser');
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
 require('./database/database')();
-const port = process.env.PORT || 9999;
 const app = express();
 const cors = require('cors');
-
-
-app.use(express.static(path.join(__dirname, '/front-end/build')));
-
-
-app.get('/', function (req, res) {
-   res.sendFile(path.join(__dirname, 'build', '/front-end/build/index.html'));
- });
-
-
 
 
 
@@ -38,5 +27,14 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message });
   next();
 });
+
+app.use(express.static(path.join(__dirname, 'front-end/build')));
+
+
+app.get('*', function (req, res) {
+   res.sendFile(path.join(__dirname+'/front-end/build/index.html'));
+ });
+
+ const port = process.env.PORT || 9999;
 
 app.listen(port, () => { console.log(`REST API listening on port: ${port}`) });
