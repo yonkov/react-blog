@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import Sidebar from '../../components/Sidebar';
 import { NavLink } from 'react-router-dom'
-import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
+import ReactHtmlParser from 'react-html-parser';
 
 class Details extends Component {
   constructor(props) {

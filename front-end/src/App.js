@@ -168,7 +168,8 @@ class App extends Component {
   }
 
   handleCommentSubmit(e, data) {
-
+    
+    
     e.preventDefault();
     e.target.reset();
     
@@ -183,7 +184,6 @@ class App extends Component {
       .then(
 
         body => {
-
           if (!body.errors) {
             toast.success(body.message);
             this.getPosts()
