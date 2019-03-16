@@ -34,7 +34,6 @@ class App extends Component {
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-
   componentDidMount() {
     const isAdmin = localStorage.getItem('isAdmin') === "true"
     const isAuthed = !!localStorage.getItem('username');
@@ -47,7 +46,6 @@ class App extends Component {
         isAuthed,
       })
     }
-
 
     this.getPosts()
 
@@ -87,8 +85,8 @@ class App extends Component {
 
   handleSearchSubmit(e){
     e.preventDefault()
+    
   }
-
 
   handleChange(e, data) {
     this.setState({
@@ -171,7 +169,9 @@ class App extends Component {
 
   handleCommentSubmit(e, data) {
 
-    e.preventDefault()
+    e.preventDefault();
+    e.target.reset();
+    
     fetch('/feed/comment/create', {
       method: "POST",
       body: JSON.stringify(data),
