@@ -28,6 +28,7 @@ class App extends Component {
       username: null,
       isAdmin: false,
       isAuthed: false,
+      jwtoken: null,
       posts: [],
       filtered: [],
     }
@@ -52,7 +53,7 @@ class App extends Component {
       })
     }
     this.getPosts()
-
+    
   }
 
   componentDidUpdate(prevProps, prevState, posts) {
@@ -163,13 +164,15 @@ class App extends Component {
         userId: data.userId,
         username: data.username,
         isAdmin: data.isAdmin,
-        isAuthed: !!data.username
+        isAuthed: !!data.username,
+        jwtoken: data.token
       })
 
       localStorage.setItem('userId', data.userId)
       localStorage.setItem('username', data.username)
       localStorage.setItem('isAdmin', data.isAdmin)
       localStorage.setItem('isAuthed', !!data.username)
+      localStorage.setItem('jwtoken', data.token)
 
       toast.success('Welcome, ' + data.username);
       this.props.history.push('/')

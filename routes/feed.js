@@ -11,6 +11,6 @@ router.post('/post/edit/:id', feedController.editPost);
 router.get('/post/delete/:id', feedController.deleteGet);
 router.post('/post/delete/:id', feedController.deletePost);
 
-router.post('/comment/create', feedController.createComment);
+router.post('/comment/create', isAuth, feedController.createComment);
 
 module.exports = router;
