@@ -151,7 +151,7 @@ class App extends Component {
     App.postService.getPost()
       .then(data => {
         this.setState({
-          posts: data.posts
+          posts: data.posts.length? data.posts : []
         });
       }
       )
