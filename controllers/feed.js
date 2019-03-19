@@ -23,6 +23,9 @@ module.exports = {
   },
   createPost: (req, res, next) => {
     const PostObj = req.body;
+    console.log(req);
+    
+    
     Post.create(PostObj)
       .then((Post) => {
         res.status(200)
@@ -137,6 +140,6 @@ module.exports = {
       }
       next(error);
     }
-  }
+  },
 
 }

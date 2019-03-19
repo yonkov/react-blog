@@ -1,13 +1,17 @@
 import React from 'react' 
-import {get} from '../data/remote.js'
- async function postService() {
-      try {
-        const res = await fetch('http://localhost:9999/feed/posts')
-        return res.json()
-        
-      } catch (error) {
-        console.error(error);
-      }
-    }
-   export default postService
+import {get, post} from '../data/remote.js'
+
+class postService extends React.Component{
+  getPost(data){
+    
+    return get('/feed/posts', data)
+  }
+  
+  createPost(data) {
+    return post('/feed/post/create', data)
+  }
+}
+
+
+export default postService
 

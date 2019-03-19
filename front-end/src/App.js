@@ -3,8 +3,6 @@ import { Route, Switch, Redirect, withRouter, } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
 
-
-import './services/authentication-service'
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './views/Home/Home';
@@ -16,9 +14,11 @@ import Details from './views/Details/Details';
 import PrivateRoute from './components/PrivateRoute';
 import Edit from './views/Edit/Edit';
 import Delete from './views/Delete/Delete';
-import Sidebar from './components/Sidebar';
 import AllPosts from './views/All/All';
 
+import PostService from "./services/post-service";
+import AuthService from "./services/auth-service";
+import CommentService from "./services/comment-service";
 
 class App extends Component {
   constructor(props) {
@@ -29,12 +29,17 @@ class App extends Component {
       isAdmin: false,
       isAuthed: false,
       posts: [],
-      filtered: []
+      filtered: [],
     }
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
+  static authService = new AuthService();
+  static postService = new PostService();
+  static commentService = new CommentService();
+
   componentDidMount() {
+
     const isAdmin = localStorage.getItem('isAdmin') === "true"
     const isAuthed = !!localStorage.getItem('username');
 
@@ -46,14 +51,13 @@ class App extends Component {
         isAuthed,
       })
     }
-
     this.getPosts()
 
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState, posts) {
     if (prevState === this.state) {
-      this.getPosts();
+      this.getPosts()
     }
   }
 
@@ -67,6 +71,12 @@ class App extends Component {
     if (day.length < 2) day = '0' + day;
 
     return [year, month, day].join('-');
+  }
+
+  handleChange(e, data) {
+    this.setState({
+      [e.target.name]: e.target.value
+    })
   }
 
   handleSearchChange(e, data) {
@@ -83,132 +93,91 @@ class App extends Component {
 
   }
 
-  handleSearchSubmit(e){
+  handleSearchSubmit(e) {
     e.preventDefault()
-    
-  }
 
-  handleChange(e, data) {
-    this.setState({
-      [e.target.name]: e.target.value
-    })
   }
 
   handleSubmit(e, data, isSignUp) {
 
     e.preventDefault()
-
-    fetch('/auth/sign' + (isSignUp ? 'up' : 'in'), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })
-      .then(
-        rawData => rawData.json()
-      )
-      .then(
-
-        body => {
-
-          if (body.username) {
-            this.setState({
-              userId: body.userId,
-              username: body.username,
-              isAdmin: body.isAdmin,
-              isAuthed: !!body.username
-            })
-
-
-            localStorage.setItem('userId', body.userId)
-            localStorage.setItem('username', body.username)
-            localStorage.setItem('isAdmin', body.isAdmin)
-            localStorage.setItem('isAuthed', !!body.username)
-
-            toast.success('Welcome, ' + body.username);
-            this.props.history.push('/')
-          }
-          else {
-            toast.error(body.message);
-          }
-        }
-      )
-      .catch(error => console.error(error));
-      
-    this.props.history.push('/')
+    App.authService.auth(data, isSignUp)
+      .then(user => {
+        this.updateUser(user)
+      })
+      .catch(e => console.log(e));
   }
 
   handleCreateSubmit(e, data) {
-    
+
     e.preventDefault();
     if (this.state.isAdmin) {
-      fetch('/feed/post/create', {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      })
-        .then(
-          rawData => rawData.json()
-        )
-        .then(
-  
-          body => {
-            if (!body.errors) {
-              toast.success(body.message);
-              this.props.history.push('/');
-              this.getPosts()
-            }
-            else {
-              toast.error(body.message);
-            }
-          }
-        )
-        .catch(error => console.error(error));      
-    }
+      App.postService.createPost(data)
+        .then(body => {
 
-  }
-
-  handleCommentSubmit(e, data) {
-    
-    
-    e.preventDefault();
-    e.target.reset();
-    
-    fetch('/feed/comment/create', {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" }
-    })
-      .then(
-        rawData => rawData.json()
-      )
-      .then(
-
-        body => {
-          if (!body.errors) {
+          if (body.Post) {
             toast.success(body.message);
-            this.getPosts()
+            this.props.history.push('/');
           }
           else {
             toast.error(body.message);
           }
+        })
+        .catch(error => console.error(error));
+    }
+  }
+
+  handleCommentSubmit(e, data) {
+
+    e.preventDefault();
+    e.target.reset();
+    App.commentService.createComment(data)
+      .then(body => {
+        this.getposts()
+        if (!body.errors) {
+          toast.success(body.message);
         }
+        else {
+          toast.error(body.message);
+        }
+      }
       )
       .catch(error => console.error(error));
 
   }
 
   getPosts() {
-    fetch('/feed/posts')
-      .then(rawData => rawData.json())
-      .then(
-
-        body => {
-          this.setState({
-            posts: body.posts
-          })
-        }
+    App.postService.getPost()
+      .then(data => {
+        this.setState({
+          posts: data.posts
+        });
+      }
       )
-      .catch(error => console.error(error));
+      .catch(e => this.setState({ e }))
+  }
+
+  updateUser = (data) => {
+    if (data.username) {
+      this.setState({
+        userId: data.userId,
+        username: data.username,
+        isAdmin: data.isAdmin,
+        isAuthed: !!data.username
+      })
+
+      localStorage.setItem('userId', data.userId)
+      localStorage.setItem('username', data.username)
+      localStorage.setItem('isAdmin', data.isAdmin)
+      localStorage.setItem('isAuthed', !!data.username)
+
+      toast.success('Welcome, ' + data.username);
+      this.props.history.push('/')
+    }
+    else {
+      toast.error(data.message);
+    }
+
   }
 
   logout() {
@@ -224,11 +193,12 @@ class App extends Component {
   }
 
   render() {
+
     return (
       <Fragment>
         <ToastContainer />
         <Header username={this.state.username} isAdmin={this.state.isAdmin} isAuthed={this.state.isAuthed} logout={this.logout.bind(this)} />
-        
+
         <Switch>
 
           <Route exact path="/" render={(props) => (
@@ -281,7 +251,7 @@ class App extends Component {
               formatDate={this.formatDate}
               {...props} />} />
 
-          <PrivateRoute  path="/edit/:id"
+          <PrivateRoute path="/edit/:id"
             isAdmin={this.state.isAdmin} render={(props) =>
               <Edit
                 isAdmin={this.state.isAdmin}
@@ -308,7 +278,7 @@ class App extends Component {
             <AllPosts posts={this.state.posts}
               handleSearchSubmit={this.handleSearchSubmit.bind(this)}
               handleChange={this.handleSearchChange.bind(this)}
-              formatDate={this.formatDate} 
+              formatDate={this.formatDate}
               {...props} />
           )} />
         </Switch>
