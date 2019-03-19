@@ -1,28 +1,35 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken')
+const User = require('../models/User')
 
 module.exports = (req, res, next) => {
-  const authHeaders = req.get('Authorization');
+  if (!req.headers.authorization) {
+    return res.status(401).end()
+  }
+
+  const token = req.headers.authorization.split(' ')[1]
+  // decode the token using a secret key-phrase
+  jwt.verify(token.toString(), 'somesupersecret', (err, decoded) => {
+    if (err) {
+      return res.status(401).end()
+    }
+
+    const userId = decoded.userId
+
+    User
+      .findOne({ _id: userId })
+      .then(user => {
+
+        if (!user) {
+          return res.status(401).end()
+        }
+        req.user = user
+        if (!req.user.roles.includes('Admin')) {
+          return res.status(401).end()
+        }
+
+        return next()
+      })
+  })
+
   
-  if (!authHeaders) {
-    return res.status(401)
-      .json({ message: 'Not authenticated.' })
-  }
-
-  const token = req.get('Authorization').split(' ')[1];
-  
-  let decodedToken;
-  try {
-    decodedToken = jwt.verify(token, 'somesupersecret')
-  } catch(error) {
-    return res.status(401)
-      .json({ message: 'Token is invalid.', error });
-  }
-
-  if (!decodedToken) {
-    return res.status(401)
-      .json({ message: 'Not authenticated.' });
-  }
-
-  req.userId = decodedToken.userId;
-  next();
 }
