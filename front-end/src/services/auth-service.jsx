@@ -1,5 +1,5 @@
 import React from 'react' 
-import {get, post} from '../data/remote.js'
+import {post} from '../data/remote.js'
 
 class authService extends React.Component{
   auth(data, isSignUp){ 

@@ -1,6 +1,7 @@
-const requester = method => {
 
-return async (url, data, options) => {
+const requester = method => {
+    
+    return async (url, data, options) => {
     const authtoken = window.localStorage.getItem('jwtoken');
         
     const predefinedHeaders = {

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import Sidebar from '../../components/Sidebar';
-import { NavLink } from 'react-router-dom'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
+import PostService from '../../services/post-service'
 
 class Edit extends Component {
   constructor(props) {
@@ -12,7 +11,8 @@ class Edit extends Component {
       content: '',
     }
     this.handleChange = props.handleChange.bind(this);
-    
+    this.PostService = new PostService();
+
   }
 
   componentDidMount() {
@@ -21,57 +21,47 @@ class Edit extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.title !== this.state.title) {
-        return;
+      return;
     }
   }
 
   editGet() {
-    fetch('/feed/post/edit/' + this.props.match.params.id)
-      .then(rawData => rawData.json())
-      .then(
-        body => {
+    this.PostService.editGet(this.props.match.params.id)
+      .then(body => {
+        if (body.post) {
 
           this.setState({
             title: body.post.title,
             imageUrl: body.post.imageUrl,
             content: body.post.content
           })
-
         }
-      )
+      })
       .catch(error => console.error(error));
   }
 
   editPost(e, data) {
     e.preventDefault();
-    
     if (this.props.isAdmin) {
-      fetch('/feed/post/edit/' + this.props.match.params.id, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" }
-    })
-      .then(
-
-        rawData => rawData.json()
-      )
-      .then(
-        body => {
+      this.PostService.editPost({
+        id: this.props.match.params.id,
+        data: data
+      })
+        .then(body => {
           if (!body.errors) {
-
-            
-            toast.success(body.message)      
+            toast.success(body.message)
             this.props.history.push('/')
           }
           else {
             console.log(body.message)
           }
-        }
-      )
-      .catch(error => console.error(error));
-    }
 
+        })
+        .catch(error => console.error(error));
+
+    }
   }
+
   render() {
     return (
       <main className="text-center form">

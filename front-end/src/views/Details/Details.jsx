@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+import Sidebar from '../../components/Sidebar';
 import { NavLink } from 'react-router-dom'
-import ReactHtmlParser from 'react-html-parser';
+import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
 
 class Details extends Component {
   constructor(props) {
     super(props);
     this.state = {
       post: null,
-      comment: null
+      comm: null
     }
     this.handleChange = props.handleChange.bind(this);
   }
@@ -26,15 +27,16 @@ class Details extends Component {
   componentDidUpdate(prevProps) {
     const { posts, match, isAuthed } = this.props;
 
-    if (JSON.stringify(prevProps) === JSON.stringify(this.props)) {
+    if (JSON.stringify(prevProps) !== JSON.stringify(this.props)) {
+      this.setState({
+        post: posts.length
+          ? posts.find(p => p._id === match.params.id)
+          : null
+      });
+    }
+    else {
       return;
     }
-
-    this.setState({
-      post: posts.length
-        ? posts.find(p => p._id === match.params.id)
-        : null
-    });
   }
 
   render() {
@@ -42,7 +44,7 @@ class Details extends Component {
     const { isAdmin, isAuthed } = this.props;
 
     if (!post) {
-      return <span>Loading post ...</span>;
+      return <span className="spinner">Loading ...</span>;
     }
 
     return (
@@ -67,27 +69,27 @@ class Details extends Component {
               <div className="pt-5">
                 <h3 className="mb-5">Comments</h3>
                 <ul className="comment-list">
-                {post.comments.map(comment =>
-                  <li key={comment._id} className="comment">
-                  <div className="vcard">
-                    <img src="/images/person_1.jpg" alt="Image placeholder" />
-                  </div>
-                  <div className="comment-body">
-                     <h3>{comment.author.username}</h3>
-                     <div className="meta">{this.props.formatDate(comment.creationDate)}</div>
-                     <p>{comment.comment}</p>
-                     <p><a href="#" className="reply rounded">Reply</a></p>
-                   </div>
-                 </li>
-                
+                  {post.comments.map(comment =>
+                    <li key={comment._id} className="comment">
+                      <div className="vcard">
+                        <img src="/images/person_1.jpg" alt="Image placeholder" />
+                      </div>
+                      <div className="comment-body">
+                        <h3>{comment.author.username}</h3>
+                        <div className="meta">{this.props.formatDate(comment.creationDate)}</div>
+                        <p>{comment.comment}</p>
+                        <p><a href="#" className="reply rounded">Reply</a></p>
+                      </div>
+                    </li>
+
                   )}
-                  
+
                 </ul>
                 {/* END comment-list */}
                 <div className="comment-form-wrap pt-5">
-                  {isAuthed ? <h3 className="mb-5">Leave a comment</h3> 
-                  : 
-                  <h3 className="mb-5">Please <NavLink to="/login">log in</NavLink> or <NavLink to="/register">register</NavLink> to post a comment</h3> }
+                  {isAuthed ? <h3 className="mb-5">Leave a comment</h3>
+                    :
+                    <h3 className="mb-5">Please <NavLink to="/login">log in</NavLink> or <NavLink to="/register">register</NavLink> to post a comment</h3>}
                   {isAuthed && <form onSubmit={(e) => this.props.handleSubmit(e, this.state)} className="p-5 bg-light">
 
                     <div className="form-group">

@@ -148,3 +148,8 @@ text-align: center;
 float: inherit;
 display: inline-block;
 }
+
+.spinner{
+  margin: 0 auto;
+  display: table;
+}

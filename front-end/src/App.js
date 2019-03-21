@@ -57,9 +57,13 @@ class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, posts) {
-    if (prevState === this.state) {
-      this.getPosts()
+    
+    if (prevState.posts===this.state.posts) {
+      
+      return
     }
+    
+    
   }
 
   formatDate(date) {
@@ -134,9 +138,11 @@ class App extends Component {
     e.target.reset();
     App.commentService.createComment(data)
       .then(body => {
-        this.getposts()
         if (!body.errors) {
           toast.success(body.message);
+          this.setState({
+            posts: body.posts.length? body.posts : []
+          });
         }
         else {
           toast.error(body.message);
@@ -266,6 +272,7 @@ class App extends Component {
           <PrivateRoute path="/delete/:id"
             isAdmin={this.state.isAdmin} render={(props) =>
               <Delete
+              isAdmin={this.state.isAdmin}
                 handleChange={this.handleChange}
                 history={this.props.history}
                 {...props} />} />
