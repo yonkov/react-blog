@@ -139,10 +139,8 @@ class App extends Component {
     App.commentService.createComment(data)
       .then(body => {
         if (!body.errors) {
+          window.location.reload()
           toast.success(body.message);
-          this.setState({
-            posts: body.posts.length? body.posts : []
-          });
         }
         else {
           toast.error(body.message);
