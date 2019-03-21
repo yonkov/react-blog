@@ -57,13 +57,9 @@ class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, posts) {
-    
-    if (prevState.posts===this.state.posts) {
-      
-      return
+    if (prevState === this.state) {
+      this.getPosts()
     }
-    
-    
   }
 
   formatDate(date) {

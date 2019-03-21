@@ -122,7 +122,6 @@ module.exports = {
 
   createComment: async (req, res, next) => {
     try {
-      
       const {comment, userId} = req.body;
       const post = req.body.post._id
       const author = userId

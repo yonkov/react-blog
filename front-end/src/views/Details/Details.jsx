@@ -11,7 +11,12 @@ class Details extends Component {
       comm: null
     }
     this.handleChange = props.handleChange.bind(this);
+     this.forceUpdateHandler=this.forceUpdateHandler.bind(this)
   }
+
+  forceUpdateHandler(){
+    this.forceUpdate();
+  };
 
   componentDidMount() {
     const { posts, match } = this.props;
@@ -27,16 +32,15 @@ class Details extends Component {
   componentDidUpdate(prevProps) {
     const { posts, match, isAuthed } = this.props;
 
-    if (JSON.stringify(prevProps) !== JSON.stringify(this.props)) {
-      this.setState({
-        post: posts.length
-          ? posts.find(p => p._id === match.params.id)
-          : null
-      });
+    if (JSON.stringify(prevProps) === JSON.stringify(this.props)) {
+      return
     }
-    else {
-      return;
-    }
+    this.setState({
+      post: posts.length
+        ? posts.find(p => p._id === match.params.id)
+        : null
+    });
+
   }
 
   render() {
