@@ -53,14 +53,27 @@ class App extends Component {
       })
     }
     this.getPosts()
-    
+
   }
 
+  //  componentDidUpdate(prevProps, prevState) {
+  //   if (prevState.posts.length > 0) {
+  //     const posts = await this.getPosts();
+  //     if (posts[0].comments.length !== this.state.posts[0].comments.length) {
+  //       this.state.posts = [...posts];
+  //       return true
+  //     }
+  //   }
+
+  //   return false;
+  // }
+
+
   componentDidUpdate(prevProps, prevState, posts) {
-    if (prevState === this.state) {
+    if (prevState.posts === this.state.posts) {
       this.getPosts()
     }
-  }
+}
 
   formatDate(date) {
     var d = new Date(date),
@@ -135,7 +148,9 @@ class App extends Component {
     App.commentService.createComment(data)
       .then(body => {
         if (!body.errors) {
-          window.location.reload()
+          setTimeout(() => {
+            this.getPosts()
+          }, 700);
           toast.success(body.message);
         }
         else {
@@ -151,7 +166,7 @@ class App extends Component {
     App.postService.getPost()
       .then(data => {
         this.setState({
-          posts: data.posts.length? data.posts : []
+          posts: data.posts.length ? data.posts : []
         });
       }
       )
@@ -266,7 +281,7 @@ class App extends Component {
           <PrivateRoute path="/delete/:id"
             isAdmin={this.state.isAdmin} render={(props) =>
               <Delete
-              isAdmin={this.state.isAdmin}
+                isAdmin={this.state.isAdmin}
                 handleChange={this.handleChange}
                 history={this.props.history}
                 {...props} />} />
